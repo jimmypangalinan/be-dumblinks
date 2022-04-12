@@ -11,8 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      user.hasMany(models.groupLink, {
-        as: "groupLink",
+      user.hasMany(models.brand, {
+        as: "brand",
         foreignKey: {
           name: "idUser",
         },

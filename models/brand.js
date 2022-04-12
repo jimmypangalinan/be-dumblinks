@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class groupLink extends Model {
+  class brand extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,15 +11,22 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      groupLink.hasMany(models.link, {
+      brand.belongsTo(models.user, {
+        as: "user",
+        foreignKey: {
+          name: "id"
+        }
+      });
+
+      brand.hasMany(models.link, {
         as: "link",
         foreignKey: {
-          name: "idGroup",
+          name: "idBrand",
         },
       });
     }
   }
-  groupLink.init({
+  brand.init({
     title: DataTypes.STRING,
     description: DataTypes.STRING,
     uniqueLink: DataTypes.STRING,
@@ -28,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
     idUser: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'groupLink',
+    modelName: 'brand',
   });
-  return groupLink;
+  return brand;
 };

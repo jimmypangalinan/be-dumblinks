@@ -1,40 +1,68 @@
 const { link } = require("../../models");
 
 // Add new link
+// exports.addLink = async (req, res) => {
+
+//     const { links } = req.body;
+//     console.log("data" + links);
+//     console.log(req.body);
+//     try {
+
+//         let idBrand = req.params.id;
+
+//         let linkToJson = JSON.parse(JSON.stringify(req.body));
+
+//         console.log(linkToJson);
+//         const newLinks = linkToJson.map((item, index) => ({
+//             titleLink: item.titleLink,
+//             url: item.url,
+//             icon: item.image,
+//             idBrand: idBrand
+//           }));
+
+//         await link.bulkCreate(newLinks);
+
+//         // let newLink = JSON.parse(JSON.stringify(createLink));
+
+//         res.status(201).send({
+//             status: "Success",
+//             message: "Success create link",
+
+//         })
+
+//     } catch (error) {
+//         res.status(400).send({
+//             status: "Failed",
+//             message: 'Sever error',
+//             error
+//         });
+//         console.log(error);
+//     }
+
+// }
+
 exports.addLink = async (req, res) => {
-    const linkExist = await link.findOne({
-        where: {
-            title: req.body.title,
-        }
-    });
 
-    if(linkExist) {
-        return res.status(200).send({
-            Status: "failed",
-            message: "Title allready exist",
-            data: {
-                linkExist,
-            }
-        });
-    }
-
+    const links = req.body;
     try {
-        
-        let dataLink = req.body;
 
-        let createLink = await link.create({
-            ...dataLink,
+        const addLinks = await link.create({
+            ...links,
             icon: req.file.filename,
         });
 
-        let newLink = JSON.parse(JSON.stringify(createLink));
+        const dataLinks = await link.findOne({
+            where: {
+                id: addLinks.id
+            }, attributes: {
+                exclude: ["createdAt", "updatedAt"]
+            }
+        });
 
         res.status(201).send({
             status: "Success",
             message: "Success create link",
-            data: {
-                newLink,
-            }
+            dataLinks,
         })
 
     } catch (error) {
@@ -48,21 +76,23 @@ exports.addLink = async (req, res) => {
 
 }
 
-// get links
+
+
+// get links by id brand
 exports.getLinks = async (req, res) => {
     try {
         const links = await link.findAll({
             where: {
-                idGroup: req.body.idGroup
+                idBrand: req.body.idBrand
             }
         });
 
-        if(!links){
+        if (!links) {
             res.status(201).send({
                 status: "Success",
                 message: "Links not found",
             });
-        }else{
+        } else {
             res.status(200).send({
                 status: "Success",
                 message: "Get links success",
@@ -86,7 +116,7 @@ exports.getLinks = async (req, res) => {
 exports.getLink = async (req, res) => {
     try {
         let linkExist = await link.findOne({
-            where:{
+            where: {
                 id: req.params.id
             },
             attributes: {
@@ -96,12 +126,12 @@ exports.getLink = async (req, res) => {
 
         linkExist = JSON.parse(JSON.stringify(linkExist));
 
-        if(!linkExist) {
+        if (!linkExist) {
             res.status(200).send({
                 status: "Success",
                 message: "Link not found",
             });
-        }else{
+        } else {
             res.status(201).send({
                 status: "Success",
                 message: "Get link success",
@@ -122,28 +152,34 @@ exports.getLink = async (req, res) => {
 
 // update link by id
 exports.updateLink = async (req, res) => {
+
+    const links = req.body;
+
     try {
-        const newData = req.body;
-        const updateLink = await link.update(newData, {
-            where: {
-                id: req.params.id
-            }
-        });
-        
-        const linkDetail = await link.findOne({
-            where: {
-                id: req.params.id,
-            },
-            attributes: {
-                exclude: ["createdAt", "updatedAt"],
-            },
-        });
+
+        await link.update({
+            ...links,
+            icon: req.file.filename,
+        },
+            {
+                where: {
+                    idBrand: req.body.idBrand
+                }
+            });
+
+            const dataLinks = await link.findOne({
+                where: {
+                    id: addLinks.id
+                }, attributes: {
+                    exclude: ["createdAt", "updatedAt"]
+                }
+            });
 
         res.status(201).send({
             status: "Success",
             message: "Success update link",
             data: {
-                linkDetail,
+                dataLinks,
             }
         });
 
@@ -162,7 +198,7 @@ exports.deleteLink = async (req, res) => {
     try {
         const linkDelete = await link.destroy({
             where: {
-                id:  req.params.id
+                id: req.params.id
             },
         });
 
@@ -172,6 +208,6 @@ exports.deleteLink = async (req, res) => {
         })
 
     } catch (error) {
-        
+
     }
 }

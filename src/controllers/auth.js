@@ -51,7 +51,7 @@ exports.register = async (req, res) => {
             id: newUser.id
         }
 
-        const SECRET_KEY = `SANGAT_RAHASIA`;
+        const SECRET_KEY = process.env.TOKEN_KEY;
         const token = jwt.sign(dataToken, SECRET_KEY);
 
         res.status(201).send({
@@ -70,6 +70,7 @@ exports.register = async (req, res) => {
             message: "Server error",
             error
           });
+        console.log(error);
      } 
 
 }
@@ -110,13 +111,13 @@ exports.login = async (req, res) => {
             id: userExist.id,
         };
       
-        const SECRET_KEY = `SANGAT_RAHASIA`;
+        const SECRET_KEY = process.env.TOKEN_KEY;
         const token = jwt.sign(dataToken, SECRET_KEY);
 
         res.status(200).send({
             status: "Success",
             message: "Email and password match",
-            dadta: {
+            data: {
                 userExist,
                 token,
             }

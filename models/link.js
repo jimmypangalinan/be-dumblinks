@@ -11,19 +11,19 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      link.belongsTo(models.groupLink, {
-        as: "groupLink",
-        foreignKey: {
-          name: "idGroup",
-        },
-      });
+      link.belongsTo(models.brand, {
+          as: "brand",
+          foreignKey: {
+            name: "idBrand",
+          },
+        });
     }
   }
   link.init({
-    title: DataTypes.STRING,
+    titleLink: DataTypes.STRING,
     url: DataTypes.STRING,
     icon: DataTypes.STRING,
-    idGroup: DataTypes.INTEGER
+    idBrand: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'link',

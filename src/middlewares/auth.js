@@ -13,7 +13,7 @@ exports.auth = (req, res, next) => {
     }
 
     try {
-        const SECRET_KEY =`SANGAT_RAHASIA`;
+        const SECRET_KEY = process.env.TOKEN_KEY;
         const verified = jwt.verify(token, SECRET_KEY);
 
         req.user = verified;

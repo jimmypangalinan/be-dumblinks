@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('links', {
+    await queryInterface.createTable('brands', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,16 +11,22 @@ module.exports = {
       title: {
         type: Sequelize.STRING
       },
-      url: {
+      description: {
         type: Sequelize.STRING
       },
-      icon: {
+      uniqueLink: {
         type: Sequelize.STRING
       },
-      idGroup: {
+      viewCount: {
+        type: Sequelize.INTEGER
+      },
+      imgBrand: {
+        type: Sequelize.STRING
+      },
+      idUser: {
         type: Sequelize.INTEGER,
         references: {
-          model: "groupLinks",
+          model: "users", 
           key: "id",
         },
         onUpdate: "CASCADE",
@@ -37,6 +43,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('links');
+    await queryInterface.dropTable('brands');
   }
 };

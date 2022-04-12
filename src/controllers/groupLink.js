@@ -1,10 +1,10 @@
-const { groupLink } = require("../../models");
+const { brand, link } = require("../../models");
+const Joi = require("joi");
 
 // Add new group link
 exports.addGroup = async (req, res) => {
 
-    console.log(req.file.filename);
-    const groupExist = await groupLink.findOne({
+    const groupExist = await brand.findOne({
         where: {
             title: req.body.title,
         }
@@ -20,29 +20,50 @@ exports.addGroup = async (req, res) => {
         });
     }
 
-    
-
     try {
-        // console.log(req.body);
-        // let newGroup = req.body;
-        // console.log(req.body.file);
-        const createGroup = await groupLink.create({
+        const { title, description } = req.body;
+        const schema = Joi.object({
+            title: Joi.string().max(35).required(),
+            description: Joi.string().max(70).required(),
+        });
+
+        const { error } = schema.validate({ title, description });
+        if (error) {
+            return res.status(400).json({
+                status: "Failed",
+                message: "error validation",
+                error: {
+                    message: error.details[0].message,
+                },
+            });
+        }
+
+        const createGroup = await brand.create({
             title: req.body.title,
             description: req.body.description,
             imgBrand: req.file.filename,
-            uniqueLink: "q2wq2w",
-            viewCount: 10,
+            uniqueLink: req.body.uniqueLink,
+            viewCount: 0,
             idUser: req.user.id
         })
 
         let newGroupLink = JSON.parse(JSON.stringify(createGroup));
+        const groups = await brand.findOne({
+            where: {
+                id: newGroupLink.id,
+            },
+            attributes: ["id", "title", "description", "uniqueLink", "viewCount"],
+            attributes: {
+                exclude: ["createdAt", "updatedAt"],
+            },
+        });
+
+        
 
         res.status(201).send({
             status: "Success",
             message: "Success create group link",
-            data: {
-                newGroupLink,
-            }
+            groups
         })
 
     } catch (error) {
@@ -58,9 +79,23 @@ exports.addGroup = async (req, res) => {
 // get group links
 exports.getGroups = async (req, res) => {
     try {
-        const groups = await groupLink.findAll({
+        const groups = await brand.findAll({
             where: {
                 idUser: req.user.id
+            },
+            order: [["createdAt", "DESC"]],
+            attributes: {
+                exclude: ["createdAt", "updatedAt"],
+            },
+            include: {
+                model: link,
+                as: "link",
+                attributes: {
+                    exclude: ["createdAt", "updatedAt"],
+                },
+            },
+            attributes: {
+                exclude: ["createdAt", "updatedAt"],
             },
         });
 
@@ -69,6 +104,7 @@ exports.getGroups = async (req, res) => {
                 status: "Success",
                 message: "Groups not found",
             });
+
         } else {
             res.status(200).send({
                 status: "Success",
@@ -91,9 +127,74 @@ exports.getGroups = async (req, res) => {
 // get group by id
 exports.getGroup = async (req, res) => {
     try {
-        let group = await groupLink.findOne({
+        let group = await brand.findOne({
             where: {
                 id: req.params.id,
+            },
+            attributes: {
+                exclude: ["createdAt", "updatedAt"],
+            },
+            include: {
+                model: link,
+                as: "link",
+                attributes: {
+                    exclude: ["createdAt", "updatedAt"],
+                },
+            },
+            attributes: {
+                exclude: ["createdAt", "updatedAt"],
+            },
+        });
+
+        group = JSON.parse(JSON.stringify(group));
+
+        const path = process.env.FILE_PATH; 
+        console.log(path);
+
+        if (!group) {
+            res.status(200).send({
+                status: "Success",
+                message: "Group not foound",
+                data: {
+                    group,
+                }
+            });
+        } else {
+            res.status(201).send({
+                status: "Success",
+                message: "Get group success",
+                data: {
+                    ...group,
+                    imgBrand: path + group.imgBrand
+                }
+            });
+        }
+
+    } catch (error) {
+        res.status(400).send({
+            status: "Failed",
+            message: 'Sever error',
+            error
+        });
+    }
+}
+
+// get group by uniqueLlink
+exports.getUniqueLink = async (req, res) => {
+    try {
+        let group = await brand.findOne({
+            where: {
+                uniqueLink: req.params.id,
+            },
+            attributes: {
+                exclude: ["createdAt", "updatedAt"],
+            },
+            include: {
+                model: link,
+                as: "link",
+                attributes: {
+                    exclude: ["createdAt", "updatedAt"],
+                },
             },
             attributes: {
                 exclude: ["createdAt", "updatedAt"],
@@ -105,7 +206,10 @@ exports.getGroup = async (req, res) => {
         if (!group) {
             res.status(200).send({
                 status: "Success",
-                message: "Group not foound"
+                message: "Group not foound",
+                data: {
+                    group,
+                }
             });
         } else {
             res.status(201).send({
@@ -129,28 +233,31 @@ exports.getGroup = async (req, res) => {
 // update group by id
 exports.updateGroup = async (req, res) => {
     try {
-        const newData = req.body;
-        const updateGroup = await groupLink.update(newData, {
+
+        const updateData = req.body;
+        console.log(req.body);
+        console.log(req.params.id);
+
+        const createGroup = await brand.update({
+            ...updateData,
+            imgBrand: req.file.filename
+        }, {
             where: {
                 id: req.params.id,
             },
-        });
+        })
 
-        const groupDetail = await groupLink.findOne({
+        const update = await brand.findOne({
             where: {
-                id: req.params.id,
-            },
-            attributes: {
-                exclude: ["createdAt", "updatedAt"],
-            },
-        });
-
+                id: req.params.id
+            }
+        })
 
         res.status(201).send({
             status: "Success",
             message: "Succes update group",
             data: {
-                groupDetail,
+                update,
             }
         });
 
@@ -166,10 +273,51 @@ exports.updateGroup = async (req, res) => {
 // delete group by id
 exports.deleteGroup = async (req, res) => {
     try {
-        const groupDelete = await groupLink.destroy({
+        const groupDelete = await brand.destroy({
             where: {
                 id: req.params.id,
             },
+            include: {
+                model: link,
+                as: "link",
+            },
+        });
+
+        res.status(201).send({
+            status: "Success",
+            message: "Success delete group",
+
+        })
+
+    } catch (error) {
+        res.status(400).send({
+            status: "Failed",
+            message: 'Sever error',
+            error
+        });
+    }
+}
+
+
+// viewCount
+exports.addViewCount = async (req, res) => {
+    try {
+        const findData = await brand.findOne({
+            where: {
+                id: req.params.id,
+            }
+        });
+
+        console.log(findData.viewCount);
+
+        const addView = {
+            viewCount: findData.viewCount + 1
+        }
+
+        const data = await brand.update(addView, {
+            where: {
+                id: req.params.id,
+            }
         });
 
         res.status(201).send({

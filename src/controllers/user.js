@@ -63,13 +63,20 @@ exports.getUser = async (req, res) => {
 
 //update user by id
 exports.updateUser = async (req, res) => {
-  const id = req.params;
   try {
+
     const dataUpdate = req.body;
+
     const newUpdate = await user.update(dataUpdate, {
       where: {
         id: req.params.id,
       },
+    })
+
+    const updateUser = await user.findOne({
+      where: {
+        id: req.params.id,
+      }, 
     })
 
     res.status(200).send({
@@ -77,6 +84,32 @@ exports.updateUser = async (req, res) => {
       message: "Update data success",
       details: updateUser,
     });
+
+  } catch (error) {
+    res.status(400).send({
+      status: "Failed",
+      message: "Bed Request",
+    })
+    console.log(error);
+  }
+}
+
+// get user
+exports.deleteUser = async (req, res) => {
+  try {
+    const userExist = await user.destroy({
+      where: {
+        id: req.params.id,
+      }
+    })
+
+
+    res.status(200).send({
+      status: "Success",
+      message: "Success delete user",
+      userExist
+    })
+
 
   } catch (error) {
     res.status(400).send({
