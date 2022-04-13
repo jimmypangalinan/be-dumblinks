@@ -1,6 +1,9 @@
 const { brand, link } = require("../../models");
 const Joi = require("joi");
 
+const cloudinary = require('../utils/cloudinary');
+
+
 // Add new group link
 exports.addGroup = async (req, res) => {
 
@@ -38,6 +41,16 @@ exports.addGroup = async (req, res) => {
             });
         }
 
+
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'uploads',
+            use_filename: true,
+            unique_filename: false,
+        });
+
+
+
+
         const createGroup = await brand.create({
             title: req.body.title,
             description: req.body.description,
@@ -58,7 +71,7 @@ exports.addGroup = async (req, res) => {
             },
         });
 
-        
+
 
         res.status(201).send({
             status: "Success",
@@ -99,7 +112,7 @@ exports.getGroups = async (req, res) => {
             },
         });
 
-        const path = process.env.FILE_PATH; 
+        const path = process.env.FILE_PATH;
 
         if (!groups) {
             res.status(201).send({
@@ -151,7 +164,7 @@ exports.getGroup = async (req, res) => {
 
         group = JSON.parse(JSON.stringify(group));
 
-        const path = process.env.FILE_PATH; 
+        const path = process.env.FILE_PATH;
 
         if (!group) {
             res.status(200).send({
@@ -163,7 +176,7 @@ exports.getGroup = async (req, res) => {
             });
         } else {
 
-            
+
             res.status(201).send({
                 status: "Success",
                 message: "Get group success",
@@ -211,7 +224,7 @@ exports.getUniqueLink = async (req, res) => {
             },
         });
 
-        const path = process.env.FILE_PATH; 
+        const path = process.env.FILE_PATH;
         group = JSON.parse(JSON.stringify(group));
 
         if (!group) {
