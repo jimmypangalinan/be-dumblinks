@@ -113,6 +113,7 @@ exports.login = async (req, res) => {
             id: userExist.id,
         };
       
+        const path = process.env.FILE_PATH; 
         const SECRET_KEY = process.env.TOKEN_KEY;
         const token = jwt.sign(dataToken, SECRET_KEY);
 
@@ -122,6 +123,7 @@ exports.login = async (req, res) => {
             data: {
                 userExist,
                 token,
+                path
             }
         });
 
