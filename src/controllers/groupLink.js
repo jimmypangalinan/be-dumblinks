@@ -63,7 +63,7 @@ exports.addGroup = async (req, res) => {
         res.status(201).send({
             status: "Success",
             message: "Success create group link",
-            groups
+            // groups
         })
 
     } catch (error) {
