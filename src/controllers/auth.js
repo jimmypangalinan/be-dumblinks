@@ -51,6 +51,7 @@ exports.register = async (req, res) => {
             id: newUser.id
         }
 
+        const path = process.env.FILE_PATH; 
         const SECRET_KEY = process.env.TOKEN_KEY;
         const token = jwt.sign(dataToken, SECRET_KEY);
 
@@ -59,7 +60,8 @@ exports.register = async (req, res) => {
             message: "Success create new user",
             data: {
                 email: newUser.email,
-                token
+                token,
+                path
             }
         })
 
