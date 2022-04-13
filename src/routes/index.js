@@ -74,7 +74,7 @@ router.patch("/view/:id", auth,  addViewCount);
 // link
 // router.post("/add-link/:id", auth, addLink);
 router.post("/add-link", auth,uploadFile("icon"), addLink);
-router.get("/links", getLinks);
+router.get("/links/:id", getLinks);
 router.get("/link/:id", getLink);
 router.patch("/link", auth,uploadFile("icon"), updateLink);
 router.delete("/link/:id", deleteLink);

@@ -99,6 +99,8 @@ exports.getGroups = async (req, res) => {
             },
         });
 
+        const path = process.env.FILE_PATH; 
+
         if (!groups) {
             res.status(201).send({
                 status: "Success",
@@ -111,6 +113,7 @@ exports.getGroups = async (req, res) => {
                 message: "Get group links success",
                 data: {
                     groups,
+                    path: path,
                 }
             })
         }
@@ -149,7 +152,6 @@ exports.getGroup = async (req, res) => {
         group = JSON.parse(JSON.stringify(group));
 
         const path = process.env.FILE_PATH; 
-        console.log(path);
 
         if (!group) {
             res.status(200).send({
@@ -160,12 +162,20 @@ exports.getGroup = async (req, res) => {
                 }
             });
         } else {
+
+            
             res.status(201).send({
                 status: "Success",
                 message: "Get group success",
+
                 data: {
                     ...group,
-                    imgBrand: path + group.imgBrand
+                    imgBrand: path + group.imgBrand,
+                    path: path,
+                    // link :{
+                    //     ...link,
+                    //     icon: path + link.icon
+                    // }
                 }
             });
         }
@@ -201,6 +211,7 @@ exports.getUniqueLink = async (req, res) => {
             },
         });
 
+        const path = process.env.FILE_PATH; 
         group = JSON.parse(JSON.stringify(group));
 
         if (!group) {
@@ -217,6 +228,7 @@ exports.getUniqueLink = async (req, res) => {
                 message: "Get group success",
                 data: {
                     group,
+                    path: path
                 }
             });
         }

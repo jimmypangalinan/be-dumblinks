@@ -80,25 +80,33 @@ exports.addLink = async (req, res) => {
 
 // get links by id brand
 exports.getLinks = async (req, res) => {
+    // console.log(rre.params.id);
     try {
         const links = await link.findAll({
             where: {
-                idBrand: req.body.idBrand
+                // idBrand: req.body.idBrand
+                idBrand: req.params.id
             }
         });
+
+        // link = JSON.parse(JSON.stringify(links));
+        // console.log(link);
+        const path = process.env.FILE_PATH; 
 
         if (!links) {
             res.status(201).send({
                 status: "Success",
                 message: "Links not found",
             });
-        } else {
+        } else {   
+            
+
             res.status(200).send({
                 status: "Success",
                 message: "Get links success",
-                data: {
-                    links
-                }
+                links,
+                path: path
+                
             })
         }
 
