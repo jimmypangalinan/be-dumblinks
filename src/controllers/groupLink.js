@@ -49,8 +49,6 @@ exports.addGroup = async (req, res) => {
         });
 
 
-
-
         const createGroup = await brand.create({
             title: req.body.title,
             description: req.body.description,
@@ -262,6 +260,13 @@ exports.updateGroup = async (req, res) => {
         const updateData = req.body;
         console.log(req.body);
         console.log(req.params.id);
+
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'uploads',
+            use_filename: true,
+            unique_filename: false,
+        });
+
 
         const createGroup = await brand.update({
             ...updateData,

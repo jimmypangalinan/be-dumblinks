@@ -49,6 +49,12 @@ exports.addLink = async (req, res) => {
     const links = req.body;
     try {
 
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'uploads',
+            use_filename: true,
+            unique_filename: false,
+        });
+
         const addLinks = await link.create({
             ...links,
             icon: req.file.filename,
@@ -167,6 +173,12 @@ exports.updateLink = async (req, res) => {
     const links = req.body;
 
     try {
+
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'uploads',
+            use_filename: true,
+            unique_filename: false,
+        });
 
         await link.update({
             ...links,
